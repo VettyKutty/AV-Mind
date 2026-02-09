@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AV Mind - Daily Review</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f7;
+            padding: 0;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a4a4a 0%, #2c2c2c 100%);
+            color: #ff3b30;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .alert-banner {
+            background: #5a5a5a;
+            color: #ff3b30;
+            padding: 15px 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+        .alert-banner.empty {
+            background: #6a6a6a;
+        }
+
+        .add-section {
+            background: white;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ff3b30;
+        }
+
+        .input-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e5e7;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #ff3b30;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #007aff !important;
+        }
+
+        .btn-camera {
+            background: #5a5a5a;
+            color: #007aff !important;
+        }
+
+        .btn-camera:active {
+            background: #4a4a4a;
+        }
+
+        .btn-add {
+            background: #6a6a6a;
+            color: #007aff !important;
+            font-size: 18px;
+        }
+
+        .btn-add:active {
+            background: #5a5a5a;
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .photo-preview {
+            margin-top: 15px;
+            position: relative;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .remove-photo {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #5a5a5a;
+            color: #007aff !important;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px;
+            justify-content: flex-start;
+        }
+
+        .filter-btn {
+            padding: 12px 30px;
+            border: 2px solid #5a5a5a;
+            border-radius: 8px;
+            background: white;
+            color: #5a5a5a;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn.active {
+            background: #5a5a5a;
+            color: #007aff;
+            border-color: #5a5a5a;
+        }
+
+        .filter-btn:hover {
+            background: #6a6a6a;
+            color: #007aff;
+        }
+
+        .section-title {
+            margin: 30px 20px 15px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #ff3b30;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge {
+            background: #5a5a5a;
+            color: #ff3b30;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .badge.today {
+            background: #6a6a6a;
+        }
+
+        .badge.done {
+            background: #7a7a7a;
+        }
+
+        .items-list {
+            margin: 0 20px 20px;
+        }
+
+        .item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .item.needs-review {
+            border-left: 5px solid #5a5a5a;
+            background: #f8f8f8;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .item-text {
+            flex: 1;
+            font-size: 16px;
+            color: #333;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .item-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #007aff !important;
+        }
+
+        .btn-done {
+            background: #6a6a6a;
+            color: #007aff !important;
+        }
+
+        .btn-delete {
+            background: #5a5a5a;
+            color: #007aff !important;
+        }
+
+        .item-date {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        .item-photo {
+            margin-top: 10px;
+        }
+
+        .item-photo img {
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal img {
+            max-width: 90%;
+            max-height: 90vh;
+            border-radius: 8px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #5a5a5a;
+            color: #007aff !important;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AV Mind</h1>
+    </div>
+
+    <div id="alertBanner" class="alert-banner" onclick="scrollToReview()">
+        <span id="alertText">Loading...</span>
+    </div>
+
+    <div class="add-section">
+        <div class="input-group">
+            <label>What needs to be remembered?</label>
+            <div class="filter-buttons">
+                <button class="filter-btn active" id="categoryPersonal" onclick="selectCategory('personal')">Personal</button>
+                <button class="filter-btn" id="categoryWork" onclick="selectCategory('work')">Work</button>
+            </div>
+            <textarea id="itemText" placeholder="Type your task, note, or reminder..."></textarea>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn btn-camera" onclick="openCamera()">
+                Add Photo
+            </button>
+            <input type="file" id="cameraInput" accept="image/*" capture="environment">
+            <button class="btn btn-add" onclick="addItem()">
+                Add Item
+            </button>
+        </div>
+
+        <div id="photoPreview" class="photo-preview" style="display: none;">
+            <img id="previewImage" src="" alt="Preview">
+            <button class="remove-photo" onclick="removePhoto()">×</button>
+        </div>
+    </div>
+
+    <div id="needsReviewSection">
+        <div class="section-title">
+            Needs Review
+            <span class="badge" id="reviewBadge">0</span>
+        </div>
+        <div class="filter-buttons">
+            <button class="filter-btn active" id="viewPersonal" onclick="setViewFilter('personal')">Personal</button>
+            <button class="filter-btn" id="viewWork" onclick="setViewFilter('work')">Work</button>
+        </div>
+        <div class="items-list" id="needsReviewList"></div>
+    </div>
+
+    <div id="todaySection">
+        <div class="section-title">
+            Today
+            <span class="badge today" id="todayBadge">0</span>
+        </div>
+        <div class="items-list" id="todayList"></div>
+    </div>
+
+    <div id="completedSection">
+        <div class="section-title">
+            Completed
+            <span class="badge done" id="completedBadge">0</span>
+        </div>
+        <div class="items-list" id="completedList"></div>
+    </div>
+
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <button class="modal-close">×</button>
+        <img id="modalImage" src="" alt="Full size">
+    </div>
+
+    <script>
+        let currentPhoto = null;
+        let selectedCategory = 'personal'; // Default category for new items
+        let viewFilter = 'personal'; // Default view filter
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadItems();
+            
+            document.getElementById('cameraInput').addEventListener('change', handlePhotoCapture);
+            
+            // Auto-refresh every minute
+            setInterval(loadItems, 60000);
+        });
+
+        function selectCategory(category) {
+            selectedCategory = category;
+            
+            // Update button states
+            document.getElementById('categoryPersonal').classList.toggle('active', category === 'personal');
+            document.getElementById('categoryWork').classList.toggle('active', category === 'work');
+        }
+
+        function setViewFilter(filter) {
+            viewFilter = filter;
+            
+            // Update button states
+            document.getElementById('viewPersonal').classList.toggle('active', filter === 'personal');
+            document.getElementById('viewWork').classList.toggle('active', filter === 'work');
+            
+            // Reload items with new filter
+            loadItems();
+        }
+
+        function openCamera() {
+            document.getElementById('cameraInput').click();
+        }
+
+        function handlePhotoCapture(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentPhoto = e.target.result;
+                    document.getElementById('previewImage').src = currentPhoto;
+                    document.getElementById('photoPreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removePhoto() {
+            currentPhoto = null;
+            document.getElementById('photoPreview').style.display = 'none';
+            document.getElementById('cameraInput').value = '';
+        }
+
+        async function addItem() {
+            const text = document.getElementById('itemText').value.trim();
+            
+            if (!text && !currentPhoto) {
+                alert('Please add some text or a photo!');
+                return;
+            }
+
+            const item = {
+                id: Date.now().toString(),
+                text: text,
+                photo: currentPhoto,
+                category: selectedCategory,
+                createdAt: new Date().toISOString(),
+                completed: false
+            };
+
+            try {
+                localStorage.setItem(`item:${item.id}`, JSON.stringify(item));
+                
+                // Clear inputs
+                document.getElementById('itemText').value = '';
+                removePhoto();
+                
+                // Reload
+                loadItems();
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (error) {
+                console.error('Error saving item:', error);
+                alert('Error saving item. Please try again.');
+            }
+        }
+
+        function loadItems() {
+            try {
+                const items = [];
+                
+                // Get all items from localStorage
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key.startsWith('item:')) {
+                        try {
+                            const item = JSON.parse(localStorage.getItem(key));
+                            // Add category if it doesn't exist (for backward compatibility)
+                            if (!item.category) {
+                                item.category = 'personal';
+                            }
+                            items.push(item);
+                        } catch (error) {
+                            console.error(`Error loading ${key}:`, error);
+                        }
+                    }
+                }
+
+                // Sort by created date (newest first)
+                items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+                // Filter by current view filter
+                const filteredItems = items.filter(item => item.category === viewFilter);
+
+                // Categorize items
+                const today = new Date().toDateString();
+                const needsReview = [];
+                const todayItems = [];
+                const completed = [];
+
+                filteredItems.forEach(item => {
+                    const itemDate = new Date(item.createdAt).toDateString();
+                    
+                    if (item.completed) {
+                        completed.push(item);
+                    } else if (itemDate !== today) {
+                        needsReview.push(item);
+                    } else {
+                        todayItems.push(item);
+                    }
+                });
+
+                // Update alert banner
+                updateAlertBanner(needsReview.length);
+
+                // Render lists
+                renderList('needsReviewList', needsReview, true);
+                renderList('todayList', todayItems, false);
+                renderList('completedList', completed, false);
+
+                // Update badges
+                document.getElementById('reviewBadge').textContent = needsReview.length;
+                document.getElementById('todayBadge').textContent = todayItems.length;
+                document.getElementById('completedBadge').textContent = completed.length;
+
+                // Hide sections if empty
+                document.getElementById('needsReviewSection').style.display = needsReview.length ? 'block' : 'none';
+                document.getElementById('todaySection').style.display = todayItems.length ? 'block' : 'none';
+                document.getElementById('completedSection').style.display = completed.length ? 'block' : 'none';
+
+            } catch (error) {
+                console.error('Error loading items:', error);
+                document.getElementById('alertText').textContent = 'Error loading items';
+            }
+        }
+
+        function updateAlertBanner(count) {
+            const banner = document.getElementById('alertBanner');
+            const text = document.getElementById('alertText');
+
+            if (count === 0) {
+                banner.className = 'alert-banner empty';
+                text.textContent = 'All caught up! No items need review.';
+            } else {
+                banner.className = 'alert-banner';
+                text.textContent = `${count} item${count > 1 ? 's' : ''} need${count === 1 ? 's' : ''} your review!`;
+            }
+        }
+
+        function renderList(listId, items, needsReview) {
+            const list = document.getElementById(listId);
+            
+            if (items.length === 0) {
+                list.innerHTML = '<div class="empty-state"><p>No items here</p></div>';
+                return;
+            }
+
+            list.innerHTML = items.map(item => {
+                const date = new Date(item.createdAt);
+                const dateStr = formatDate(date);
+                
+                return `
+                    <div class="item ${needsReview ? 'needs-review' : ''}">
+                        <div class="item-header">
+                            <div class="item-text">${escapeHtml(item.text) || '<em>Photo only</em>'}</div>
+                        </div>
+                        ${item.photo ? `
+                            <div class="item-photo">
+                                <img src="${item.photo}" alt="Photo" onclick="showModal('${item.photo}')">
+                            </div>
+                        ` : ''}
+                        <div class="item-date">${dateStr}</div>
+                        <div class="item-actions">
+                            ${!item.completed ? `<button class="item-btn btn-done" onclick="markDone('${item.id}')">Done</button>` : ''}
+                            <button class="item-btn btn-delete" onclick="deleteItem('${item.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatDate(date) {
+            const now = new Date();
+            const diffTime = Math.abs(now - date);
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) {
+                return `Today at ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+            } else if (diffDays === 1) {
+                return `Yesterday at ${date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`;
+            } else if (diffDays < 7) {
+                return `${diffDays} days ago`;
+            } else {
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function markDone(id) {
+            try {
+                const itemData = localStorage.getItem(`item:${id}`);
+                if (itemData) {
+                    const item = JSON.parse(itemData);
+                    item.completed = true;
+                    localStorage.setItem(`item:${id}`, JSON.stringify(item));
+                    loadItems();
+                }
+            } catch (error) {
+                console.error('Error marking done:', error);
+                alert('Error updating item. Please try again.');
+            }
+        }
+
+        function deleteItem(id) {
+            if (confirm('Delete this item permanently?')) {
+                try {
+                    localStorage.removeItem(`item:${id}`);
+                    loadItems();
+                } catch (error) {
+                    console.error('Error deleting item:', error);
+                    alert('Error deleting item. Please try again.');
+                }
+            }
+        }
+
+        function scrollToReview() {
+            const section = document.getElementById('needsReviewSection');
+            if (section.style.display !== 'none') {
+                section.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function showModal(photoSrc) {
+            document.getElementById('modalImage').src = photoSrc;
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
